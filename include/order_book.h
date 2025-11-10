@@ -1,11 +1,16 @@
 #include <cstdint>
 #include <unordered_map>
+#include <iostream>
 #include "types.h"
+#include "tree.h"
 
 class OrderBook
 {
 private:
     std::unordered_map<uint64_t, Order> orders;
+    PriceLevelTree<Side::Sell> asks;
+    PriceLevelTree<Side::Buy> bids;
+
 
 public:
     inline void add_buy_order(uint64_t order_id,
@@ -22,6 +27,8 @@ public:
                                              price,
                                              entry_time,
                                              event_time));
+        /// TODO: add matching here
+        bids.add_level(&orders.at(order_id));
     }
 
     inline void add_sell_order(uint64_t order_id,
@@ -38,6 +45,8 @@ public:
                                              price,
                                              entry_time,
                                              event_time));
+        /// TODO: add mathcing here
+        asks.add_level(&orders.at(order_id));
     }
 
     inline void add_order(uint64_t order_id,
@@ -61,6 +70,19 @@ public:
                                  price,
                                  entry_time,
                                  event_time);
+        }
+    }
+
+    /// DEBUG
+    inline void display_orders()
+    {
+        std::cout << "----Orders----" << std::endl;
+        for (const auto &order : orders)
+        {
+            const char* side = (order.second.buy_or_sell == Side::Buy) ? "Buy" : "Sell";
+            std::cout << "order_id: " << order.first << " side: " << side
+                      << " quantity: " << order.second.shares
+                      << " price: " << order.second.limit << std::endl;
         }
     }
 };

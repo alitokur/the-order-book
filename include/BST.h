@@ -1,3 +1,5 @@
+#pragma once
+#include <iostream>
 
 template<typename T> struct BSTNode
 {
@@ -46,6 +48,18 @@ template<typename T> void insert_to_bst(BSTNode<T> **root, BSTNode<T> *node)
             current = current->right;
         }
     }
+}
+
+template <typename T>
+void in_order_traversal(BSTNode<T> *node)
+{
+    if (node == nullptr)
+        return;
+
+    in_order_traversal(node->left);
+    std::cout << node->key << " ";
+    in_order_traversal(node->right);
+
 }
 
 

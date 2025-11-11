@@ -50,7 +50,11 @@ struct Order : DLLNode
 struct Level : BSTNode<uint64_t>
 {
 
-    uint32_t count = 0; const uint32_t _padding = 0; uint64_t volume = 0; Order *order_head = nullptr; Order *order_tail = nullptr;
+    uint32_t count = 0;
+    const uint32_t _padding = 0;
+    uint64_t volume = 0;
+    Order *order_head = nullptr;
+    Order *order_tail = nullptr;
     explicit Level(Order *order) :
         BSTNode<uint64_t>(order->limit),
         count(1),

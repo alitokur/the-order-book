@@ -45,3 +45,6 @@
 
 # cache Files
 *.cache
+
+#vscode
+*.vscode

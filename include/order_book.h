@@ -84,5 +84,23 @@ public:
                       << " quantity: " << order.second.shares
                       << " price: " << order.second.limit << std::endl;
         }
+
+        std::cout << "----Bids Tree----" << std::endl;
+        bids.display_tree();
+        std::cout << std::endl;
+        std::cout << "----Asks Tree----" << std::endl;
+        asks.display_tree();
+        std::cout << std::endl;
+        
+        std::cout << "Best Ask Info: " << std::endl;
+        asks.info_best();
+        
+        std::cout << "Best Bid Info: " << std::endl;
+        bids.info_best();
+ 
     }
+
+    /// DEBUG 
+
+
 };

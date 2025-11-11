@@ -8,7 +8,17 @@ int main (int argc, char *argv[]) {
     book.add_order(2, Side::Buy, 2, 200, 0, 0);
     book.add_order(3, Side::Sell, 3, 300, 0, 0);
     book.add_order(4, Side::Sell, 3, 300, 0, 0);
-
+    book.add_order(5, Side::Sell, 29, 400, 0, 0);
+    book.add_order(6, Side::Sell, 29, 500, 0, 0);
+    book.add_order(7, Side::Sell, 55, 600, 0, 0);
+    book.add_order(8, Side::Sell, 3, 240, 0, 0);
+    book.add_order(9, Side::Sell, 29, 250, 0, 0);
+    book.add_order(10, Side::Buy, 9, 900, 0, 0);
+    book.add_order(11, Side::Buy, 21, 700, 0, 0);
+    book.add_order(12, Side::Buy, 13, 10, 0, 0);
+    book.add_order(13, Side::Buy, 34, 920, 0, 0);
+    book.add_order(14, Side::Buy, 12, 290, 0, 0);
+    book.add_order(15, Side::Sell, 29, 240, 0, 0);
     book.display_orders();
 
     return 0;

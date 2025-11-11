@@ -5,6 +5,32 @@
 #include <unordered_map>
 #include <iostream>
 
+template<Side side> void set_best(Level **best, Level *level);
+
+template<> inline void set_best<Side::Buy>(Level **best_buy, Level *level)
+{
+    if (*best_buy == nullptr)
+    {
+        *best_buy = level;
+    }
+    else if (level->key > (*best_buy)->key)
+    {
+        *best_buy = level;
+    }
+}
+
+template<> inline void set_best<Side::Sell>(Level **best_sell, Level *level)
+{
+    if (*best_sell == nullptr)
+    {
+        *best_sell = level;
+    }
+    else if (level->key < (*best_sell)->key)
+    {
+        *best_sell = level;
+    }
+}
+
 template<Side side> class PriceLevelTree
 {
     Level *root = nullptr;
@@ -26,7 +52,7 @@ public:
             insert_to_bst(reinterpret_cast<BSTNode<uint64_t> **>(&root),
                           static_cast<BSTNode<uint64_t> *>(order->level));
 
-            /// TODO: set best price
+            set_best<side>(&best, order->level);
 
             levels.emplace(order->level->key, order->level);
         }
@@ -41,5 +67,16 @@ public:
         }
         ++count;
         volume += order->shares;
+        if(best != nullptr) last_best_price = best->key;
     };
+
+    void display_tree(){
+        in_order_traversal(reinterpret_cast<BSTNode<uint64_t> *>(root));
+    }
+
+    void info_best()
+    {
+        std::cout << "price: " << best->key << " count: " << best->count
+                  << " volume: " << best->volume << std::endl;
+    }
 };

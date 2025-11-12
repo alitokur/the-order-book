@@ -79,9 +79,11 @@ public:
         switch(order->buy_or_sell){
             case Side::Sell:{
                 asks.cancel_order(order);
+                break;
             }
             case Side::Buy:{
                 bids.cancel_order(order);
+                break;
             }
         }
 

@@ -50,6 +50,22 @@ template<typename T> void insert_to_bst(BSTNode<T> **root, BSTNode<T> *node)
     }
 }
 
+template<typename T>
+inline BSTNode<T>* find_min_node(BSTNode<T>* root){
+    while(root->left != nullptr){
+        root = root->left;
+    }
+    return root;
+}
+
+template<typename T>
+inline BSTNode<T>* find_max_node(BSTNode<T>* root){
+    while(root->right != nullptr){
+        root = root->right;
+    }
+    return root;
+}
+
 template<typename T> void remove_from_bst(BSTNode<T> **root, BSTNode<T> *node)
 {
 
@@ -73,7 +89,7 @@ template<typename T> void remove_from_bst(BSTNode<T> **root, BSTNode<T> *node)
         }
         else //C
         {
-            node->parent->right == nullptr;
+            node->parent->right = nullptr;
         }
     }
     /*
@@ -138,11 +154,32 @@ template<typename T> void remove_from_bst(BSTNode<T> **root, BSTNode<T> *node)
         }
         else{
             /// TODO: find the mind node
-            auto min_node = min(node->right);
-
+            auto min_node = find_min_node(node->right);
+            if(min_node->right != nullptr){
+                min_node->parent->left = min_node->right;
+                min_node->right->parent = min_node->parent;
+            }else if(min_node != node->right){
+                min_node->parent->left = nullptr;
+            }
+            min_node->parent = node->parent;
+            min_node->left = node->left;
+            min_node->left->parent = min_node;
+            min_node->right = node->right;
+            min_node->right->parent = min_node;
+            if(*root == node){
+                *root = min_node;
+            }
+            else if(node->parent->left == node){
+                node->parent->left = min_node;
+            }
+            else{
+                node->parent->right = min_node;
+            }
         }
     }
 }
+
+
 
 template<typename T> void in_order_traversal(BSTNode<T> *node)
 {

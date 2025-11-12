@@ -1,8 +1,10 @@
 
+#include "BST.h"
 #include "types.h"
 #include "DLL.h"
+#include <__iterator/access.h>
 #include <cstdint>
-#include <sys/_types/_id_t.h>
+#include <iterator>
 #include <unordered_map>
 #include <iostream>
 
@@ -31,6 +33,40 @@ template<> inline void set_best<Side::Sell>(Level **best_sell, Level *level)
         *best_sell = level;
     }
 }
+
+template<Side side>
+void find_best(Level** best);
+
+template<>
+inline void find_best<Side::Buy>(Level** best_buy){
+    if ((*best_buy)->parent == nullptr)
+    {
+        *best_buy = static_cast<Level*>((*best_buy)->left);
+    }
+    else{
+        *best_buy = static_cast<Level*>((*best_buy)->parent);
+    }
+
+    if(*best_buy != nullptr){
+        *best_buy = static_cast<Level*>(find_max_node(*best_buy));
+    }
+}
+
+template<>
+inline void find_best<Side::Sell>(Level** best_sell){
+    if ((*best_sell)->parent == nullptr)
+    {
+        *best_sell = static_cast<Level*>((*best_sell)->right);
+    }
+    else{
+        *best_sell = static_cast<Level*>((*best_sell)->parent);
+    }
+
+    if(*best_sell != nullptr){
+        *best_sell = static_cast<Level*>(find_min_node(*best_sell));
+    }
+}
+
 
 template<Side side> class PriceLevelTree
 {
@@ -73,11 +109,18 @@ public:
 
     void cancel_order(Order *order)
     {
+        std::cout << "cancel order " << std::endl;
         auto level = order->level;
         if (order->prev == nullptr && order->next == nullptr)
         {
-            //remove_from_bst();
-            /// TODO: update best
+            std::cout << "removing node from tree: " << order->limit << std::endl;
+            remove_from_bst(reinterpret_cast<BSTNode<uint64_t> **>(&root),
+                            static_cast<BSTNode<uint64_t> *>(level));
+
+            if( best == level){
+                find_best<side>(&best);
+            }
+
             levels.erase(level->key);
             delete level;
         }
@@ -85,13 +128,16 @@ public:
         {
             --level->count;
             level->volume -= order->shares;
-            ///TODO: remove from dll
+            remove_from_dll(reinterpret_cast<DLLNode**>(&level->order_head),
+                            reinterpret_cast<DLLNode**>(&level->order_tail),
+            static_cast<DLLNode*>(order));
         }
 
         --count;
         volume -= order->shares;
-
-        /// TODO: update last_best_price
+        if(best!= nullptr){
+            last_best_price = best->key;
+        }
     }
 
     void display_tree(){
@@ -100,6 +146,8 @@ public:
 
     void info_best()
     {
+        if(best == nullptr)
+            return;
         std::cout << "price: " << best->key << " count: " << best->count
                   << " volume: " << best->volume << std::endl;
     }

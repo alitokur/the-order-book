@@ -3,6 +3,7 @@
 #include "types.h"
 #include "DLL.h"
 #include <cstdint>
+#include <random>
 #include <unordered_map>
 #include <iostream>
 
@@ -66,18 +67,32 @@ inline void find_best<Side::Sell>(Level** best_sell){
 }
 
 
+template<Side side>
+bool can_match(uint64_t limit, uint64_t market);
+
+template<>
+inline bool can_match<Side::Buy>(uint64_t limit, uint64_t market){
+    return market == 0 || market <=limit;
+}
+
+template<>
+inline bool can_match<Side::Sell>(uint64_t limit, uint64_t market){
+    return market == 0 || market >=limit;
+}
+
 template<Side side> class PriceLevelTree
 {
     Level *root = nullptr;
     std::unordered_map<uint64_t, Level *> levels;
-    Level *best = nullptr;
     uint64_t last_best_price = 0;
     uint32_t count = 0;
-    uint64_t volume = 0;
 
 public:
+    uint64_t volume = 0;
+    Level *best = nullptr;
     void add_level(Order *order)
     {
+        std::cout << "calling add level" << std::endl;
         if (levels.count(order->limit) == 0)
         {
             std::cout << "empty price level... creating for: " << order->limit
@@ -136,6 +151,30 @@ public:
         if(best!= nullptr){
             last_best_price = best->key;
         }
+    }
+    
+    template<typename C>
+    void market_order(Order* order, C is_fill){
+        while(best != nullptr && can_match<side>(best->key, order->limit)){
+            auto match = best->order_head;
+            if(match->shares >= order->shares){
+                if(match->shares == order->shares){
+                    cancel_order(match);
+                    is_fill(match->id_number);
+                }
+                else{
+                    match->shares -= order->shares;
+                    match->level->volume -= order->shares;
+                    volume-= order->shares;
+                }
+                order->shares = 0;
+                return;
+            }
+            order->shares -= match->shares;
+            cancel_order(match);
+            is_fill(match->id_number);
+        }
+
     }
 
     void display_tree(){

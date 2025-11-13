@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <sys/_types/_id_t.h>
 #include <unordered_map>
 #include <iostream>
 #include "types.h"
@@ -10,7 +11,6 @@ private:
     std::unordered_map<uint64_t, Order> orders;
     PriceLevelTree<Side::Sell> asks;
     PriceLevelTree<Side::Buy> bids;
-
 
 public:
     inline void add_buy_order(uint64_t order_id,
@@ -27,7 +27,17 @@ public:
                                              price,
                                              entry_time,
                                              event_time));
-        /// TODO: add matching here
+        if (asks.best != nullptr && price >= asks.best->key)
+        {
+            std::cout << " order match!!" << std::endl;
+            asks.market_order(&orders.at(order_id),
+                              [&](uint64_t id) { orders.erase(id); });
+            if (orders.at(order_id).shares == 0)
+            {
+                orders.erase(order_id);
+                return;
+            }
+        }
         bids.add_level(&orders.at(order_id));
     }
 
@@ -45,7 +55,20 @@ public:
                                              price,
                                              entry_time,
                                              event_time));
+
         /// TODO: add mathcing here
+        if (bids.best != nullptr && price <= bids.best->key)
+        {
+            std::cout << " order match!!" << std::endl;
+            bids.market_order(&orders.at(order_id),
+                              [&](uint64_t id) { orders.erase(id); });
+            if (orders.at(order_id).shares == 0)
+            {
+                orders.erase(order_id);
+                return;
+            }
+        }
+
         asks.add_level(&orders.at(order_id));
     }
 
@@ -86,7 +109,46 @@ public:
                 break;
             }
         }
+        orders.erase(order_id);
+    }
 
+    inline void execute_order(uint64_t order_id, uint32_t quantity)
+    {
+        auto order = &orders.at(order_id);
+        if (quantity > order->shares)
+        {
+            std::cout << "ERROR";
+            return;
+        }
+        order->shares -= quantity;
+        order->level->volume -= quantity;
+        switch (order->buy_or_sell)
+        {
+        case Side::Sell: {
+            asks.volume -= quantity;
+            break;
+        };
+        case Side::Buy: {
+            bids.volume -= quantity;
+            break;
+        }
+        }
+
+        if (order->shares == 0)
+        {
+            switch (order->buy_or_sell)
+            {
+            case Side::Sell: {
+                asks.cancel_order(order);
+                break;
+            }
+            case Side::Buy: {
+                bids.cancel_order(order);
+                break;
+            }
+            }
+            orders.erase(order_id);
+        }
     }
 
     /// DEBUG
@@ -115,8 +177,5 @@ public:
         bids.info_best();
  
     }
-
     /// DEBUG 
-
-
 };

@@ -3,6 +3,7 @@
 #include <iostream>
 #include "types.h"
 #include "tree.h"
+#include "robin_hood.h"
 
 class OrderBook
 {
@@ -148,6 +149,19 @@ public:
             }
             orders.erase(order_id);
         }
+    }
+
+    /// combination of: cancel + add
+    inline void modify_order(uint64_t old_order_id,
+                             uint64_t new_order_id,
+                             uint32_t quantity,
+                             uint64_t price,
+                             Side side,
+                             uint64_t entry_time,
+                             uint64_t event_time)
+    {
+        cancel_order(old_order_id);
+        add_order(new_order_id, side, quantity, price, entry_time, event_time);
     }
 
     /// DEBUG

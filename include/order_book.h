@@ -27,9 +27,15 @@ public:
                                              price,
                                              entry_time,
                                              event_time));
+        // orders.try_emplace(order_id,
+        //                order_id,
+        //                Side::Buy,
+        //                quantity,
+        //                price,
+        //                entry_time,
+        //                event_time);
         if (asks.best != nullptr && price >= asks.best->key)
         {
-            std::cout << " order match!!" << std::endl;
             asks.market_order(&orders.at(order_id),
                               [&](uint64_t id) { orders.erase(id); });
             if (orders.at(order_id).shares == 0)
@@ -59,7 +65,6 @@ public:
         /// TODO: add mathcing here
         if (bids.best != nullptr && price <= bids.best->key)
         {
-            std::cout << " order match!!" << std::endl;
             bids.market_order(&orders.at(order_id),
                               [&](uint64_t id) { orders.erase(id); });
             if (orders.at(order_id).shares == 0)
@@ -167,14 +172,14 @@ public:
     /// DEBUG
     inline void display_orders()
     {
-        std::cout << "----Orders----" << std::endl;
-        for (const auto &order : orders)
-        {
-            const char* side = (order.second.buy_or_sell == Side::Buy) ? "Buy" : "Sell";
-            std::cout << "order_id: " << order.first << " side: " << side
-                      << " quantity: " << order.second.shares
-                      << " price: " << order.second.limit << std::endl;
-        }
+        // std::cout << "----Orders----" << std::endl;
+        // for (const auto &order : orders)
+        // {
+        //     const char* side = (order.second.buy_or_sell == Side::Buy) ? "Buy" : "Sell";
+        //     std::cout << "order_id: " << order.first << " side: " << side
+        //               << " quantity: " << order.second.shares
+        //               << " price: " << order.second.limit << std::endl;
+        // }
 
         std::cout << "----Bids Tree----" << std::endl;
         bids.display_tree();

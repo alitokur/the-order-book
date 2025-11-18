@@ -92,11 +92,8 @@ public:
     Level *best = nullptr;
     void add_level(Order *order)
     {
-        std::cout << "calling add level" << std::endl;
         if (levels.count(order->limit) == 0)
         {
-            std::cout << "empty price level... creating for: " << order->limit
-                      << std::endl;
             order->level = new Level(order);
 
             insert_to_bst(reinterpret_cast<BSTNode<uint64_t> **>(&root),
@@ -108,7 +105,6 @@ public:
         }
         else
         {
-            std::cout << "adding to linked list for " << order->limit << std::endl;
             order->level = levels.at(order->limit);
             ++order->level->count;
             order->level->volume += order->shares;
@@ -122,11 +118,9 @@ public:
 
     void cancel_order(Order *order)
     {
-        std::cout << "cancel order " << std::endl;
         auto level = order->level;
         if (order->prev == nullptr && order->next == nullptr)
         {
-            std::cout << "removing node from tree: " << order->limit << std::endl;
             remove_from_bst(reinterpret_cast<BSTNode<uint64_t> **>(&root),
                             static_cast<BSTNode<uint64_t> *>(level));
 

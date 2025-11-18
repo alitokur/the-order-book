@@ -55,6 +55,7 @@ struct Level : BSTNode<uint64_t>
     uint64_t volume = 0;
     Order *order_head = nullptr;
     Order *order_tail = nullptr;
+    
     explicit Level(Order *order) :
         BSTNode<uint64_t>(order->limit),
         count(1),

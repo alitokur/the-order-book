@@ -1,9 +1,4 @@
-
-#include "BST.h"
 #include "types.h"
-#include "DLL.h"
-#include <cstdint>
-#include <random>
 #include <unordered_map>
 #include <iostream>
 
@@ -123,15 +118,21 @@ public:
             order->level = levels.at(order->limit);
             ++order->level->count;
             order->level->volume += order->shares;
-            append_to_dll(reinterpret_cast<DLLNode **>(
-                              &order->level->order_tail),
-                          static_cast<DLLNode *>(order));
+            append_to_dll(&order->level->order_tail, order);
         }
         ++count;
         volume += order->shares;
         if (best != nullptr)
             last_best_price = best->key;
     };
+
+    inline void append_to_dll(Order **tail, Order *node)
+    {
+        (*tail)->next = node;
+        node->prev = *tail;
+        *tail = node;
+    }
+
 
     void insert_to_bst(Level **root, Level *node)
     {
@@ -186,9 +187,9 @@ public:
         {
             --level->count;
             level->volume -= order->shares;
-            remove_from_dll(reinterpret_cast<DLLNode **>(&level->order_head),
-                            reinterpret_cast<DLLNode **>(&level->order_tail),
-                            static_cast<DLLNode *>(order));
+            remove_from_dll(&level->order_head,
+                           &level->order_tail,
+                            (order));
         }
 
         --count;
@@ -197,6 +198,28 @@ public:
         {
             last_best_price = best->key;
         }
+    }
+    
+    inline void remove_from_dll(Order **head, Order **tail, Order *node)
+    {
+        if (node->prev != nullptr)
+        {
+            node->prev->next = node->next;
+        }
+        if (node->next != nullptr)
+        {
+            node->next->prev = node->prev;
+        }
+        if (*head == node)
+        {
+            *head = node->next;
+        }
+        if (*tail == node)
+        {
+            *head = node->prev;
+        }
+        node->next = nullptr;
+        node->prev = nullptr;
     }
 
     void remove_from_bst(Level **root, Level *node)
@@ -345,7 +368,7 @@ public:
         return root;
     }
 
-    template<typename T> void in_order_traversal(Level *node)
+    void in_order_traversal(Level *node)
     {
         if (node == nullptr)
             return;
@@ -384,7 +407,7 @@ public:
 
     void display_tree()
     {
-        // in_order_traversal(root);
+        in_order_traversal(root);
     }
 
     void info_best()

@@ -14,7 +14,7 @@ struct TestOrder{
     uint32_t entry_timestamp;
 };
 
-#define ORDER_NUM 4000000
+#define ORDER_NUM 200000000
 
 // S(t+Δt) = S(t) * exp( (μ - 0.5σ²)*Δt + σ * sqrt(Δt) * Z )
 inline double gbm(double S, double mu, double sigma, double dt)

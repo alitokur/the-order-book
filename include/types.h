@@ -47,21 +47,30 @@ struct Order : DLLNode
     }
 };
 
-struct Level : BSTNode<uint64_t>
+/// TODO: make it template for Level Price
+struct Level 
 {
-
     uint32_t count = 0;
     const uint32_t _padding = 0;
     uint64_t volume = 0;
     Order *order_head = nullptr;
     Order *order_tail = nullptr;
     
+    /// for tree utilities 
+    uint64_t key; //price level
+    Level* left = nullptr;
+    Level* right = nullptr;
+    Level* parent = nullptr;
+
     explicit Level(Order *order) :
-        BSTNode<uint64_t>(order->limit),
         count(1),
         volume(order->shares),
         order_head(order),
-        order_tail(order)
+        order_tail(order),
+        key(order->limit),
+        left(nullptr),
+        right(nullptr),
+        parent(nullptr)
     {
     }
 };

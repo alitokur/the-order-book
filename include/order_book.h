@@ -62,7 +62,6 @@ public:
                                              entry_time,
                                              event_time));
 
-        /// TODO: add mathcing here
         if (bids.best != nullptr && price <= bids.best->key)
         {
             bids.market_order(&orders.at(order_id),
@@ -73,7 +72,6 @@ public:
                 return;
             }
         }
-
         asks.add_level(&orders.at(order_id));
     }
 

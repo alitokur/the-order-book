@@ -1,6 +1,7 @@
 #include "types.h"
 #include <unordered_map>
 #include <iostream>
+#include "pool.h"
 
 inline Level* find_min_node(Level* root){
     while(root->left != nullptr){
@@ -92,6 +93,7 @@ template<Side side> class PriceLevelTree
     std::unordered_map<uint64_t, Level *> levels;
     uint64_t last_best_price = 0;
     uint32_t count = 0;
+    Pool pool;
 
 public:
     uint64_t volume = 0;
@@ -100,7 +102,8 @@ public:
     {
         if (levels.count(order->limit) == 0)
         {
-            order->level = new Level(order);
+            // order->level = new Level(order);
+            order->level = pool.get_level(order);
 
             insert_to_bst(&root, order->level);
 
@@ -176,7 +179,8 @@ public:
             }
 
             levels.erase(level->key);
-            delete level;
+            pool.release_level(level);
+            // delete level;
         }
         else
         {

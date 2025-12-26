@@ -99,18 +99,19 @@ public:
         }
     }
 
-
-    inline void cancel_order(uint64_t order_id){
+    inline void cancel_order(uint64_t order_id)
+    {
         auto order = &orders.at(order_id);
-        switch(order->buy_or_sell){
-            case Side::Sell:{
-                asks.cancel_order(order);
-                break;
-            }
-            case Side::Buy:{
-                bids.cancel_order(order);
-                break;
-            }
+        switch (order->buy_or_sell)
+        {
+        case Side::Sell: {
+            asks.cancel_order(order);
+            break;
+        }
+        case Side::Buy: {
+            bids.cancel_order(order);
+            break;
+        }
         }
         orders.erase(order_id);
     }
@@ -173,8 +174,9 @@ public:
         // std::cout << "----Orders----" << std::endl;
         // for (const auto &order : orders)
         // {
-        //     const char* side = (order.second.buy_or_sell == Side::Buy) ? "Buy" : "Sell";
-        //     std::cout << "order_id: " << order.first << " side: " << side
+        //     const char* side = (order.second.buy_or_sell == Side::Buy) ?
+        //     "Buy" : "Sell"; std::cout << "order_id: " << order.first << "
+        //     side: " << side
         //               << " quantity: " << order.second.shares
         //               << " price: " << order.second.limit << std::endl;
         // }
@@ -185,13 +187,12 @@ public:
         std::cout << "----Asks Tree----" << std::endl;
         asks.display_tree();
         std::cout << std::endl;
-        
+
         std::cout << "Best Ask Info: " << std::endl;
         asks.info_best();
-        
+
         std::cout << "Best Bid Info: " << std::endl;
         bids.info_best();
- 
     }
-    /// DEBUG 
+    /// DEBUG
 };

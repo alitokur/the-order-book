@@ -24,11 +24,10 @@ struct Order
     const uint64_t limit = 0;
     uint64_t entry_time = 0;
     uint64_t event_time = 0;
-    Level *level = nullptr;
-    Order *next = nullptr;
-    Order *prev = nullptr;
+    Level* level = nullptr;
+    Order* next = nullptr;
+    Order* prev = nullptr;
 
-    /// TODO: add double linked list here
 
     Order(uint64_t _order_id,
           Side _side,
@@ -46,22 +45,21 @@ struct Order
     }
 };
 
-/// TODO: make it template for Level Price
-struct Level 
+struct Level
 {
     uint32_t count = 0;
     const uint32_t _padding = 0;
     uint64_t volume = 0;
-    Order *order_head = nullptr;
-    Order *order_tail = nullptr;
-    
-    /// for tree utilities 
-    uint64_t key; //price level
+    Order* order_head = nullptr;
+    Order* order_tail = nullptr;
+
+    /// for tree utilities
+    uint64_t key; // price level
     Level* left = nullptr;
     Level* right = nullptr;
     Level* parent = nullptr;
 
-    explicit Level(Order *order) :
+    explicit Level(Order* order) :
         count(1),
         volume(order->shares),
         order_head(order),

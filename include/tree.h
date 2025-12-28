@@ -1,20 +1,10 @@
 #include "types.h"
 #include <unordered_map>
 #include <iostream>
+#include "pool.h"
+#include "dll.h"
+#include "bst.h"
 
-inline Level* find_min_node(Level* root){
-    while(root->left != nullptr){
-        root = root->left;
-    }
-    return root;
-}
-
-inline Level* find_max_node(Level* root){
-    while(root->right != nullptr){
-        root = root->right;
-    }
-    return root;
-}
 
 template<Side side> void set_best(Level **best, Level *level);
 template<> inline void set_best<Side::Buy>(Level **best_buy, Level *level)
@@ -92,6 +82,7 @@ template<Side side> class PriceLevelTree
     std::unordered_map<uint64_t, Level *> levels;
     uint64_t last_best_price = 0;
     uint32_t count = 0;
+    Pool pool;
 
 public:
     uint64_t volume = 0;
@@ -100,7 +91,8 @@ public:
     {
         if (levels.count(order->limit) == 0)
         {
-            order->level = new Level(order);
+            // order->level = new Level(order);
+            order->level = pool.get_level(order);
 
             insert_to_bst(&root, order->level);
 
@@ -121,47 +113,6 @@ public:
             last_best_price = best->key;
     };
 
-    inline void append_to_dll(Order **tail, Order *node)
-    {
-        (*tail)->next = node;
-        node->prev = *tail;
-        *tail = node;
-    }
-
-
-    void insert_to_bst(Level **root, Level *node)
-    {
-        if (*root == nullptr)
-        {
-            *root = node;
-            return;
-        }
-
-        auto current = *root;
-        while (current != nullptr)
-        {
-            if (node->key < current->key)
-            {
-                if (current->left == nullptr)
-                {
-                    current->left = node;
-                    node->parent = current;
-                    return;
-                }
-                current = current->left;
-            }
-            else
-            {
-                if (current->right == nullptr)
-                {
-                    current->right = node;
-                    node->parent = current;
-                    return;
-                }
-                current = current->right;
-            }
-        }
-    }
 
     void cancel_order(Order *order)
     {
@@ -176,7 +127,8 @@ public:
             }
 
             levels.erase(level->key);
-            delete level;
+            pool.release_level(level);
+            // delete level;
         }
         else
         {

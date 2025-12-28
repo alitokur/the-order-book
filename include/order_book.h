@@ -2,15 +2,15 @@
 #include <unordered_map>
 #include <iostream>
 #include "types.h"
-#include "tree.h"
+#include "price_levels.h"
 #include "robin_hood.h"
 
 class OrderBook
 {
 private:
     std::unordered_map<uint64_t, Order> orders;
-    PriceLevelTree<Side::Sell> asks;
-    PriceLevelTree<Side::Buy> bids;
+    PriceLevel<Side::Sell> asks;
+    PriceLevel<Side::Buy> bids;
 
 public:
     inline void add_buy_order(uint64_t order_id,

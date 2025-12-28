@@ -5,12 +5,13 @@
 </div>
 
 <h6>
-C++ Limit Order Book With Object Pooling
+C++ Order Book Playground
 
 Build:
 ```bash
-mkdir build
-cd build
+git clone https://github.com/alitokur/the-order-book.git
+git submodule update --init --recursive
+mkdir build && cd build
 cmake ..
 make -j
 ```
